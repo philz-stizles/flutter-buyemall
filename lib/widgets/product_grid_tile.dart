@@ -1,6 +1,5 @@
 import 'package:buyemall/models/product.dart';
 import 'package:buyemall/providers/cart_provider.dart';
-import 'package:buyemall/providers/products_provider.dart';
 import 'package:buyemall/screens/product_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -39,8 +38,20 @@ class ProductGridTile extends StatelessWidget {
           ),
           onPressed: () {
             cartProvider.addCartItem(product.id, product.title, product.price);
+            Scaffold.of(context).hideCurrentSnackBar();
+            Scaffold.of(context).showSnackBar(_buildSnackBar(
+                'Added item to cart!', Colors.green, Colors.greenAccent));
           }),
     );
+  }
+
+  Widget _buildSnackBar(message, actionColor, bgColor) {
+    return SnackBar(
+        content: Text(message),
+        backgroundColor: bgColor,
+        //duration: Duration(minutes: 1),
+        action: SnackBarAction(
+            label: 'UNDO', textColor: actionColor, onPressed: () {}));
   }
 
   @override

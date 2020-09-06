@@ -1,6 +1,8 @@
 import 'package:buyemall/providers/cart_provider.dart';
 import 'package:buyemall/screens/cart_screen.dart';
+import 'package:buyemall/screens/screens.dart';
 import 'package:buyemall/widgets/badges.dart';
+import 'package:buyemall/widgets/drawers.dart';
 import 'package:buyemall/widgets/products_grid.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -65,32 +67,7 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
         ],
       ),
       body: ProductsGrid(_showFavs),
-      floatingActionButton: FloatingActionButton(onPressed: null),
-      drawer: Drawer(
-        child: Column(
-          children: [
-            AppBar(
-              title: Text('Menu'),
-              automaticallyImplyLeading: false,
-            ),
-            ListTile(
-              leading: Icon(MdiIcons.shopping),
-              title: Text('Shop'),
-              onTap: () {
-                Navigator.of(context).pushReplacementNamed('/');
-              },
-            ),
-            Divider(),
-            ListTile(
-              leading: Icon(MdiIcons.contactlessPayment),
-              title: Text('Orders'),
-              onTap: () {
-                Navigator.of(context).pushReplacementNamed('/');
-              },
-            )
-          ],
-        ),
-      ),
+      drawer: SimpleDrawer(),
     );
   }
 }

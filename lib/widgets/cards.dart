@@ -45,7 +45,7 @@ class DismissibleTileCard extends StatelessWidget {
     this.subTitle,
     this.trailing,
     this.leading,
-    this.id, this.onDismissed,
+    this.id, this.onDismissed, this.confirmDismiss,
   }) : super(key: key);
 
   final String id;
@@ -54,6 +54,7 @@ class DismissibleTileCard extends StatelessWidget {
   final String subTitle;
   final String trailing;
   final Function onDismissed;
+  final Function confirmDismiss;
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +72,7 @@ class DismissibleTileCard extends StatelessWidget {
           color: Colors.white,
         ),
       ),
+      confirmDismiss: confirmDismiss,
       onDismissed: onDismissed,
       child: ListTileCard(leading: leading, title: title, subTitle: subTitle, 
         trailing: trailing,)

@@ -1,16 +1,13 @@
+import 'dart:convert';
+
 import 'package:buyemall/models/product.dart';
+import 'package:buyemall/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class ProductsProvider with ChangeNotifier {
+  final _baseUrl = 'https://flutter-api-62abb.firebaseio.com/';
   List<Product> _items = [
-    Product(
-      id: 'p1',
-      title: 'Red Shirt',
-      description: 'A red shirt - it is pretty red!',
-      price: 29.99,
-      imageUrl:
-          'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
-    ),
     Product(
       id: 'p2',
       title: 'Trousers',
@@ -37,16 +34,71 @@ class ProductsProvider with ChangeNotifier {
     ),
   ];
 
+  String _token;
+
+  void update(AuthProvider authProvider) {
+    _token = authProvider.authenticatedUser.token;
+    notifyListeners();
+  }
+
   List<Product> get items {
     return [..._items]; // return a copy of the items
   }
 
   List<Product> get favoriteItems {
-    return [..._items.where((item) => item.isFavorite == true)]; // return a copy of favorite items
+    return [
+      ..._items.where((item) => item.isFavorite == true)
+    ]; // return a copy of favorite items
   }
 
-  Map<String, Object> addProduct(Map<String, dynamic> newProduct) {
-    _items.add(new Product(id: null, title: null, description: null, price: null, imageUrl: null));
+  Future<void> addProduct(Map<String, dynamic> newProduct) async {
+    newProduct['isFavorite'] = false;
+    newProduct['createdAt'] = newProduct['updatedAt'] = DateTime.now();
+
+    return http.post( // Ensure you return the Future returned by http and 
+    // then that returned by then. You could decide not to return anything from 
+    // then which would return Future<void>
+      _baseUrl+'products.json',
+      body: json.encode(newProduct),
+      headers: {'Content-Type': 'application/json'}).then((response) {
+      final responseData = json.decode(response.body);
+
+      _items.add(new Product(
+          id: responseData['name'],
+          title: newProduct['title'],
+          description: newProduct['description'],
+          price: newProduct['price'],
+          imageUrl: newProduct['imageUrl'],
+          createdAt: newProduct['createdAt'],
+          updatedAt: newProduct['updatedAt']));
+      notifyListeners();
+    });
+  }
+
+  Future<void> updateProduct(String id, Map<String, dynamic> updatedProduct) {
+    updatedProduct['updatedAt'] = DateTime.now();
+
+    return http.post( // Ensure you return the Future returned by http and 
+    // then that returned by then. You could decide not to return anything from 
+    // then which would return Future<void>
+      _baseUrl+'products.json/'+id,
+      body: json.encode(updatedProduct),
+      headers: {'Content-Type': 'application/json'}).then((response) {
+        final responseData = json.decode(response.body);
+
+        var index = _items.indexWhere((element) => element.id == id);
+        _items[index] = new Product(
+          id: DateTime.now().toIso8601String(),
+          title: updatedProduct['title'],
+          description: updatedProduct['description'],
+          price: updatedProduct['price'],
+          imageUrl: updatedProduct['imageUrl']);
+      notifyListeners();
+    });
+  }
+
+  void deleteProduct(String id) {
+    _items.removeWhere((element) => element.id == id);
     notifyListeners();
   }
 

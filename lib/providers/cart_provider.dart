@@ -49,4 +49,9 @@ class CartProvider with ChangeNotifier {
     });
     return total;
   }
+
+  void clear() {
+    _cartItems.clear();
+    notifyListeners();
+  }
 }

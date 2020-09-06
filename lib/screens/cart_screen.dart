@@ -1,8 +1,7 @@
-import 'package:buyemall/models/cart.dart';
 import 'package:buyemall/providers/cart_provider.dart';
+import 'package:buyemall/providers/orders_provider.dart';
 import 'package:buyemall/widgets/cards.dart';
 import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
 class CartScreen extends StatelessWidget {
@@ -38,7 +37,15 @@ class CartScreen extends StatelessWidget {
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                     FlatButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          final ordersProvider = Provider.of<OrdersProvider>(
+                              context,
+                              listen: false);
+                          ordersProvider.addOrder(
+                              cartProvider.cartItems.values.toList(),
+                              cartProvider.cartTotalAmount);
+                          cartProvider.clear();
+                        },
                         child: Text(
                           'ORDER NOW',
                           style:
@@ -56,13 +63,37 @@ class CartScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               var cartItem = cartProvider.cartItems.values.toList()[index];
               return DismissibleTileCard(
-                id: cartItem.id, 
-                leading: '\$${(cartItem.price * cartItem.quantity)}',
-                title: cartItem.title,
-                subTitle: 'Total: ${cartItem.price}',
-                trailing: '${cartItem.quantity} X',
-                onDismissed: (_) => cartProvider.removeCartItem(cartItem.productId),
-              );
+                  id: cartItem.id,
+                  leading: '\$${(cartItem.price * cartItem.quantity)}',
+                  title: cartItem.title,
+                  subTitle: 'Total: ${cartItem.price}',
+                  trailing: '${cartItem.quantity} X',
+                  onDismissed: (_) =>
+                      cartProvider.removeCartItem(cartItem.productId),
+                  confirmDismiss: (DismissDirection direction) {
+                    return showDialog<bool>(
+                      context: context,
+                      builder: (ctx) {
+                        return AlertDialog(
+                          title: Text('Are you sure?'),
+                          content: Text(
+                              'Do you want to remove the item from the cart?'),
+                          actions: <Widget>[
+                            FlatButton(
+                                onPressed: () {
+                                  Navigator.of(ctx).pop(false);
+                                },
+                                child: Text('No')),
+                            FlatButton(
+                                onPressed: () {
+                                  Navigator.of(ctx).pop(true);
+                                },
+                                child: Text('Yes'))
+                          ],
+                        );
+                      },
+                    );
+                  });
             },
           ))
         ],
