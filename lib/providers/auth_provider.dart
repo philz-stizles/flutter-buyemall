@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:buyemall/models/user.dart';
-import 'package:buyemall/screens/auth_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -33,7 +32,7 @@ class AuthProvider with ChangeNotifier {
   }
 
   bool get isAuthenticated {
-    print(token);
+    // print(token);
     return (token != null);
   }
 
@@ -43,11 +42,11 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> signUp(Map<String, dynamic> userCredentials) async {
     _authIsLoading = true;
-    print(userCredentials);
+    // print(userCredentials);
     notifyListeners();
 
     userCredentials["returnSecureToken"] = true;
-    print(userCredentials);
+    // print(userCredentials);
 
     try {
       var response = await http.post(_baseUrl + _signUpEndpoint + _key,
@@ -55,8 +54,8 @@ class AuthProvider with ChangeNotifier {
           headers: {'Content-Type': 'application/json'});
 
       var responseData = json.decode(response.body);
-      print(response.statusCode);
-      print(responseData);
+      // print(response.statusCode);
+      // print(responseData);
 
       if (responseData['error'] != null) {
         throw HttpException(responseData['error']['message']);
@@ -72,7 +71,7 @@ class AuthProvider with ChangeNotifier {
     print(_baseUrl + _signInEndpoint + _key);
 
     try {
-      var response = await http.post(_baseUrl + _signInEndpoint + _key,
+      var response = await http.post(_baseUrl+_signInEndpoint+_key,
           body: json.encode(userCredentials),
           headers: {'Content-Type': 'application/json'});
 
@@ -136,8 +135,8 @@ class AuthProvider with ChangeNotifier {
     final storedEncodedUser = store.getString('storedUser');
     final storedUser = json.decode(storedEncodedUser) as Map<String, Object>;
     final expiresIn = DateTime.parse(storedUser['expiresIn']);
-    print('try autologin');
-    print(storedUser['userId']);
+    // print('try autologin');
+    // print(storedUser['userId']);
 
     if (expiresIn.isBefore(DateTime.now())) {
       return false;

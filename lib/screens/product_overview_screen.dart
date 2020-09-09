@@ -1,4 +1,5 @@
 import 'package:buyemall/providers/cart_provider.dart';
+import 'package:buyemall/providers/products_provider.dart';
 import 'package:buyemall/screens/cart_screen.dart';
 import 'package:buyemall/screens/screens.dart';
 import 'package:buyemall/widgets/badges.dart';
@@ -17,9 +18,20 @@ class ProductOverviewScreen extends StatefulWidget {
 
 class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
   bool _showFavs = false;
-  Color _color;
-  int data;
+  bool _isLoading = false;
   Widget child;
+
+  @override
+  void initState() {
+    _isLoading = true;
+    Provider.of<ProductsProvider>(context, listen: false).fetchProducts()
+      .then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,13 +72,16 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
                   icon: MdiIcons.cartPlus,
                   value: cartProvider.cartItemsCount.toString(),
                   onPressed: () {
-                    return Navigator.of(context).pushNamed(CartScreen.routeName);
+                    return Navigator.of(context)
+                        .pushNamed(CartScreen.routeName);
                   });
             },
           )
         ],
       ),
-      body: ProductsGrid(_showFavs),
+      body: (_isLoading) 
+        ? Center(child: CircularProgressIndicator(),)
+        : ProductsGrid(_showFavs),
       drawer: SimpleDrawer(),
     );
   }
